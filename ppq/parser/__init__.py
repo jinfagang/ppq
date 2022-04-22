@@ -11,6 +11,7 @@ from .onnx_exporter import OnnxExporter
 from .onnx_parser import OnnxParser
 from .onnxruntime_exporter import ONNXRUNTIMExporter
 from .onnxruntime_oos_exporter import ORTOOSExporter
+from .awm_ort_oos_exporter import UnbeliveableAwesomeORTOOSExporter
 from .ppl import PPLBackendExporter
 from .tensorRT import TensorRTExporter
 from .matex_exporter import MetaxExporter

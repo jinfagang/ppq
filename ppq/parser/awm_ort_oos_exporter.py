@@ -22,7 +22,12 @@ class QuantJointOpInputOrder(Enum):
     OUTPUT_FIRST = 2
 
 
-class ORTOOSExporter(ONNXRUNTIMExporter):
+class UnbeliveableAwesomeORTOOSExporter(ONNXRUNTIMExporter):
+
+    '''
+    this export carefully fit all demands from users.
+    we give everything you want but not what you need.
+    '''
     ASYMMETRICAL_ZP_NP_TYPE = torch.uint8
     SYMMETRICAL_ZP_NP_TYPE = torch.int8
     BIAS_NP_TYPE = torch.int32
@@ -150,7 +155,7 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
         self, bias: torch.Tensor, scale: torch.Tensor, zero_point: torch.Tensor
     ) -> torch.Tensor:
         return (
-            ((bias / scale).round() + zero_point).cpu().to(ORTOOSExporter.BIAS_NP_TYPE)
+            ((bias / scale).round() + zero_point).cpu().to(UnbeliveableAwesomeORTOOSExporter.BIAS_NP_TYPE)
         )
 
     def add_scale_and_zp_parameter(
@@ -162,8 +167,8 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
         link_to_source=False,
     ) -> Tuple[Variable]:
         if self.is_quantize_parameter_added(var, graph):
-            scale = graph.variables[var.name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX]
-            offset = graph.variables[var.name + ORTOOSExporter.ZP_PARAMETER_SUFFIX]
+            scale = graph.variables[var.name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX]
+            offset = graph.variables[var.name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX]
             scale.dest_ops.append(var.dest_ops[dest_index])
             offset.dest_ops.append(var.dest_ops[dest_index])
             if link_to_source:
@@ -181,15 +186,15 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
                 else [var.dest_ops[dest_index]]
             )
             scale = Variable(
-                name=var.name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX,
+                name=var.name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX,
                 value=convert_any_to_torch_tensor(
-                    scale, dtype=ORTOOSExporter.SCALE_NP_TYPE
+                    scale, dtype=UnbeliveableAwesomeORTOOSExporter.SCALE_NP_TYPE
                 ),
                 is_parameter=True,
                 dest_ops=dest_ops,
             )
             offset = Variable(
-                name=var.name + ORTOOSExporter.ZP_PARAMETER_SUFFIX,
+                name=var.name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX,
                 value=convert_any_to_torch_tensor(offset, dtype=offset_dtype),
                 is_parameter=True,
                 dest_ops=dest_ops,
@@ -231,10 +236,10 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
         if self.is_quantize_parameter_added(var, graph):
             # quantization parameter would be shared by multiple operations
             graph.variables[
-                var.name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX
+                var.name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX
             ].dest_ops.append(var.dest_ops[index])
             graph.variables[
-                var.name + ORTOOSExporter.ZP_PARAMETER_SUFFIX
+                var.name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX
             ].dest_ops.append(var.dest_ops[index])
         else:
             # add new quantization parameter
@@ -256,7 +261,7 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
             graph,
             0,
             quantize_config,
-            ORTOOSExporter.QUANTIZE_PARAMETER_SUFFIX,
+            UnbeliveableAwesomeORTOOSExporter.QUANTIZE_PARAMETER_SUFFIX,
             is_bias=False,
         )
         return quant_val, scale_val, offset_val
@@ -272,8 +277,8 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
                 graph,
                 0,
                 quantize_config,
-                ORTOOSExporter.BIAS_QUANTIZE_PARAMETER_SUFFIX
-                + ORTOOSExporter.QUANTIZE_PARAMETER_SUFFIX,
+                UnbeliveableAwesomeORTOOSExporter.BIAS_QUANTIZE_PARAMETER_SUFFIX
+                + UnbeliveableAwesomeORTOOSExporter.QUANTIZE_PARAMETER_SUFFIX,
                 is_bias=True,
             )
         else:
@@ -285,8 +290,8 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
                 graph,
                 0,
                 quantize_config,
-                ORTOOSExporter.WEIGHT_QUANTIZE_PARAMETER_SUFFIX
-                + ORTOOSExporter.QUANTIZE_PARAMETER_SUFFIX,
+                UnbeliveableAwesomeORTOOSExporter.WEIGHT_QUANTIZE_PARAMETER_SUFFIX
+                + UnbeliveableAwesomeORTOOSExporter.QUANTIZE_PARAMETER_SUFFIX,
                 is_bias=False,
             )
         if is_bias is False:
@@ -298,13 +303,13 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
     ) -> Operation:
         quantize_config = var.dest_op_configs[index]
         quant_op = Operation(
-            name=var.name + ORTOOSExporter.QUANTIZE_LINEAR_SUFFIX,
+            name=var.name + UnbeliveableAwesomeORTOOSExporter.QUANTIZE_LINEAR_SUFFIX,
             op_type="QuantizeLinear",
             attributes={},
         )
         graph.append_operation(quant_op)
         link_var = Variable(
-            name=var.name + ORTOOSExporter.LINKER_VAR_SUFFIX,
+            name=var.name + UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX,
             dest_ops=[],
             source_op=quant_op,
         )
@@ -323,13 +328,13 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
     ) -> Operation:
         quantize_config = var.source_op_config
         dequant_op = Operation(
-            name=var.name + ORTOOSExporter.DEQUANTIZE_LINEAR_SUFFIX,
+            name=var.name + UnbeliveableAwesomeORTOOSExporter.DEQUANTIZE_LINEAR_SUFFIX,
             op_type="DequantizeLinear",
             attributes={},
         )
         graph.append_operation(dequant_op)
         link_var = Variable(
-            name=var.name + ORTOOSExporter.LINKER_VAR_SUFFIX,
+            name=var.name + UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX,
             dest_ops=[],
             source_op=dequant_op,
         )
@@ -356,10 +361,10 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
 
     def transform_qlinear_conv(self, graph: BaseGraph, op: Operation) -> None:
         # Input scale
-        input_val_name = op.inputs[0].name.split(ORTOOSExporter.LINKER_VAR_SUFFIX)[0]
+        input_val_name = op.inputs[0].name.split(UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX)[0]
         input_scale, input_offset = (
-            graph.variables[input_val_name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX],
-            graph.variables[input_val_name + ORTOOSExporter.ZP_PARAMETER_SUFFIX],
+            graph.variables[input_val_name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX],
+            graph.variables[input_val_name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX],
         )
         # Weight scale
         weight_val = op.inputs[1]
@@ -370,10 +375,10 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
         ) = self.add_quant_parameter_for_conv_op(graph, weight_val, False)
         # Output scale
         assert len(op.outputs) == 1
-        output_val_name = op.outputs[0].name.split(ORTOOSExporter.LINKER_VAR_SUFFIX)[0]
+        output_val_name = op.outputs[0].name.split(UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX)[0]
         output_scale, output_offset = (
-            graph.variables[output_val_name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX],
-            graph.variables[output_val_name + ORTOOSExporter.ZP_PARAMETER_SUFFIX],
+            graph.variables[output_val_name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX],
+            graph.variables[output_val_name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX],
         )
         qlinear_conv_inputs = [
             op.inputs[0],
@@ -401,16 +406,16 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
     ) -> None:
         # Output scale
         assert len(op.outputs) == 1
-        output_val_name = op.outputs[0].name.split(ORTOOSExporter.LINKER_VAR_SUFFIX)[0]
+        output_val_name = op.outputs[0].name.split(UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX)[0]
         output_scale, output_offset = (
-            graph.variables[output_val_name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX],
-            graph.variables[output_val_name + ORTOOSExporter.ZP_PARAMETER_SUFFIX],
+            graph.variables[output_val_name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX],
+            graph.variables[output_val_name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX],
         )
         qlinear_inputs_for_origin_outputs = [output_scale, output_offset]
         # Input scales
         qlinear_inputs_for_origin_inputs = []
         for index, input_value in enumerate(op.inputs):
-            input_val_name = input_value.name.split(ORTOOSExporter.LINKER_VAR_SUFFIX)[0]
+            input_val_name = input_value.name.split(UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX)[0]
             if input_value.is_parameter:
                 (
                     input_value,
@@ -421,10 +426,10 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
             else:
                 input_scale, input_offset = (
                     graph.variables[
-                        input_val_name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX
+                        input_val_name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX
                     ],
                     graph.variables[
-                        input_val_name + ORTOOSExporter.ZP_PARAMETER_SUFFIX
+                        input_val_name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX
                     ],
                 )
             qlinear_inputs_for_origin_inputs.extend(
@@ -444,17 +449,17 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
         self, graph: BaseGraph, op: Operation, is_global=False
     ) -> None:
         # Input scale
-        input_val_name = op.inputs[0].name.split(ORTOOSExporter.LINKER_VAR_SUFFIX)[0]
+        input_val_name = op.inputs[0].name.split(UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX)[0]
         input_scale, input_offset = (
-            graph.variables[input_val_name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX],
-            graph.variables[input_val_name + ORTOOSExporter.ZP_PARAMETER_SUFFIX],
+            graph.variables[input_val_name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX],
+            graph.variables[input_val_name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX],
         )
         # Output scale
         assert len(op.outputs) == 1
-        output_val_name = op.outputs[0].name.split(ORTOOSExporter.LINKER_VAR_SUFFIX)[0]
+        output_val_name = op.outputs[0].name.split(UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX)[0]
         output_scale, output_offset = (
-            graph.variables[output_val_name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX],
-            graph.variables[output_val_name + ORTOOSExporter.ZP_PARAMETER_SUFFIX],
+            graph.variables[output_val_name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX],
+            graph.variables[output_val_name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX],
         )
         qlinear_inputs = [
             op.inputs[0],
@@ -472,7 +477,7 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
 
     def transform_qlinear_matmul(self, graph: BaseGraph, op: Operation) -> None:
         # Input scale 0
-        input_val_name_0 = op.inputs[0].name.split(ORTOOSExporter.LINKER_VAR_SUFFIX)[0]
+        input_val_name_0 = op.inputs[0].name.split(UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX)[0]
         if op.inputs[0].is_parameter:
             input_0, input_scale_0, input_offset_0 = self.add_quant_parameter_for_op(
                 graph, op.inputs[0]
@@ -482,12 +487,12 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
             input_0 = op.inputs[0]
             input_scale_0, input_offset_0 = (
                 graph.variables[
-                    input_val_name_0 + ORTOOSExporter.SCALE_PARAMETER_SUFFIX
+                    input_val_name_0 + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX
                 ],
-                graph.variables[input_val_name_0 + ORTOOSExporter.ZP_PARAMETER_SUFFIX],
+                graph.variables[input_val_name_0 + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX],
             )
         # Input scale 1
-        input_val_name_1 = op.inputs[1].name.split(ORTOOSExporter.LINKER_VAR_SUFFIX)[0]
+        input_val_name_1 = op.inputs[1].name.split(UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX)[0]
         if op.inputs[1].is_parameter:
             input_1, input_scale_1, input_offset_1 = self.add_quant_parameter_for_op(
                 graph, op.inputs[1]
@@ -497,16 +502,16 @@ class ORTOOSExporter(ONNXRUNTIMExporter):
             input_1 = op.inputs[1]
             input_scale_1, input_offset_1 = (
                 graph.variables[
-                    input_val_name_1 + ORTOOSExporter.SCALE_PARAMETER_SUFFIX
+                    input_val_name_1 + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX
                 ],
-                graph.variables[input_val_name_1 + ORTOOSExporter.ZP_PARAMETER_SUFFIX],
+                graph.variables[input_val_name_1 + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX],
             )
         # Output scale
         assert len(op.outputs) == 1
-        output_val_name = op.outputs[0].name.split(ORTOOSExporter.LINKER_VAR_SUFFIX)[0]
+        output_val_name = op.outputs[0].name.split(UnbeliveableAwesomeORTOOSExporter.LINKER_VAR_SUFFIX)[0]
         output_scale, output_offset = (
-            graph.variables[output_val_name + ORTOOSExporter.SCALE_PARAMETER_SUFFIX],
-            graph.variables[output_val_name + ORTOOSExporter.ZP_PARAMETER_SUFFIX],
+            graph.variables[output_val_name + UnbeliveableAwesomeORTOOSExporter.SCALE_PARAMETER_SUFFIX],
+            graph.variables[output_val_name + UnbeliveableAwesomeORTOOSExporter.ZP_PARAMETER_SUFFIX],
         )
         qlinear_inputs = [
             input_0,
